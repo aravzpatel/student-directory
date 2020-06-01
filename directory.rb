@@ -20,11 +20,11 @@ def print_header
     puts "--------"
 end
 
-def print(names, key)
-    names.each_with_index do |name,index|
-        if name[:name].length < key
-        puts "#{index+1}. #{name[:name]} (#{name[:cohort]}) cohort)"
-        end
+def print(names)
+    x = 0
+    while x < names.length
+        puts "#{names[x][:name]}, (cohort #{names[x][:cohort]})"
+        x += 1
     end
 end
 
@@ -35,5 +35,5 @@ end
 #nothing will happen until we call the method
 students = input_students
 print_header
-print(students, 12)
+print(students)
 print_footer(students)
