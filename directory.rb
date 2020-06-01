@@ -4,18 +4,24 @@ def input_students
     
     name = "hold"
     while name != "" do
+        x = 0
         puts "Please enter the name of the students"
         puts "To finish, just hit return twice"
         name = gets.chomp
             break if name.empty?
-            
+
         puts "Enter in the cohort date:"
-        cohort = gets.chomp
+        cohort = gets.chomp.to_sym
+        cohort = "n/a" if cohort.to_s == ""
 
         puts "Enter in the DOB"
-        dob = gets.chomp
-
-        students << {name: name, cohort: cohort, dob: dob}
+        dob = gets.chomp.to_sym
+        dob = "n/a" if dob.to_s == ""
+        
+        
+            hash = Hash.new ("default")
+            hash = {name: name, cohort: cohort, dob: dob}   
+            students << hash 
         puts "Now we have #{students.count} students"
     end
 
@@ -28,11 +34,10 @@ def print_header
     puts "--------"
 end
 
-def print(names)
-    x = 0
-    while x < names.length
-        puts "#{names[x][:name]}, #{names[x][:dob]} (cohort #{names[x][:cohort]})"
-        x += 1
+def print(names, cohort)
+    names.sort_by! {|student| student[:cohort]}
+    names.each do |student|
+        puts "#{student[:name]}, #{student[:dob]} (cohort #{student[:cohort]})".center(100) if student[:cohort] == cohort.to_sym
     end
 end
 
@@ -43,5 +48,5 @@ end
 #nothing will happen until we call the method
 students = input_students
 print_header
-print(students)
+print(students, "june")
 print_footer(students)
