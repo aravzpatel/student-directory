@@ -22,7 +22,7 @@ end
 
 def print(names, key)
     names.each_with_index do |name,index|
-        if name[:name][0] == key
+        if name[:name].length < key
         puts "#{index+1}. #{name[:name]} (#{name[:cohort]}) cohort)"
         end
     end
@@ -35,5 +35,5 @@ end
 #nothing will happen until we call the method
 students = input_students
 print_header
-print(students, "A")
+print(students, 12)
 print_footer(students)
