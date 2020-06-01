@@ -22,7 +22,7 @@ def input_students
             hash = Hash.new ("default")
             hash = {name: name, cohort: cohort, dob: dob}   
             students << hash 
-        puts "Now we have #{students.count} students"
+        puts "Now we have #{students.count} student" + (students.count == 1 ? "" : "s")
     end
 
     students
@@ -42,7 +42,7 @@ def print(names, cohort)
 end
 
 def print_footer(names)
-    puts "Overall, we have #{names.length}  great students"
+    puts "Overall, we have #{names.length} great student" + (names.count == 1 ? "" : "s")
 end
 
 #nothing will happen until we call the method
