@@ -1,30 +1,79 @@
 @students = []
+@options_hash = {
+    "1" => [:input_students, "1. Input the students", "You are inputting students"],
+    "2" => [:show_students, "2. Show the students", "Here are the students:"],
+    "3" => [:save_students, "3. Save the list of #{$filename}", "Your list has been saved"],
+    "4" => [:load_students, "4. Load the list from #{$filename}", "The list has been loaded"],
+    "9" => [:exit, "9. exit", "Good bye"]
+}
 
-def input_students
-    name = "hold"
-    while name != "" do
-        x = 0
-        puts "Please enter the name of the students"
-        puts "To finish, just hit return twice"
-        name = gets.strip
-            break if name.empty?
-
-        puts "Enter in the cohort date:"
-        cohort = gets.strip.to_sym
-        cohort = "n/a" if cohort.to_s == ""
-
-        puts "Enter in the DOB"
-        dob = gets.strip.to_sym
-        dob = "n/a" if dob.to_s == ""
-        
-        
-            hash = Hash.new ("default")
-            hash = {name: name, cohort: cohort, dob: dob}   
-            @students << hash 
-        puts "Now we have #{@students.count} student" + (@students.count == 1 ? "" : "s")
+#nothing will happen until we call the method
+def interactive_menu
+    loop do
+        print_menu
+        process(STDIN.gets.chomp)
     end
 end
 
+def print_menu
+    @options_hash.each do |key, option|
+        puts option[1].center(75)
+    end
+end
+
+def process(selection)
+    puts @options_hash[selection][2]
+    @options_hash[selection][0] == nil ? interactive_menu : send(@options_hash[selection][0])
+end
+
+def request_inputs(string)
+    puts string
+    variable = STDIN.gets.chomp
+    return variable
+end
+
+def input_students
+    # request_inputs("Please enter the name of the students. To finish, hit return twice")
+    # name = STDIN.print
+    # puts name
+    name = ""
+    while name != "quit" do
+        puts "Please enter the name of the students"
+        puts "To finish, enter quit"
+        name = STDIN.gets.strip
+            return if name == "quit"
+
+        puts "Enter in the cohort date:"
+        cohort = STDIN.gets.strip.to_sym
+        cohort = "n/a" if cohort.to_s == ""
+
+        #puts "Enter in the DOB"
+        #dob = STDIN.gets.strip.to_sym
+        #dob = "n/a" if dob.to_s == ""
+            create_students(name, cohort)
+        print_student_count(@students)
+    end
+end
+
+def create_students(name, cohort)
+    @students << {name: name, cohort: cohort.to_sym}
+end
+
+def show_students
+    print_header
+    print_students_list(@students)
+    print_student_count(@students)
+end
+
+def save_students
+    file = File.open("students.csv", "w")
+    @students.each do |student|
+        student_data = [student[:name], student[:cohort]]
+        csv_line = student_data.join(",")
+        file.puts csv_line
+    end
+    file.close
+end
 
 def print_header
     puts "The students of Villains Academy"
@@ -32,70 +81,40 @@ def print_header
 end
 
 def print_students_list(names)
-    names.sort_by! {|student| student[:cohort]}
-    names.each do |student|
-        puts "#{student[:name]}, #{student[:dob]} (cohort #{student[:cohort]})".center(100)
+    # puts "which cohort do you want to see?"
+    # choice = STDIN.gets.chomp
+    # names.sort_by! {|student| student[:cohort]}
+    names.map do |student|
+        puts "#{student[:name]}, #{student[:dob]} (cohort #{student[:cohort]})".center(75) #if student[:cohort] == choice
     end
 end
 
-def print_footer(names)
-    puts "Overall, we have #{names.length} great student" + (names.count == 1 ? "" : "s")
+def print_student_count(names)
+    puts "Overall, we have #{names.length} student" + (names.count == 1 ? "" : "s")
 end
 
-#nothing will happen until we call the method
-def interactive_menu
-    loop do
-        print_menu
-        process(gets.chomp)
-    end
-  end
-
-  def print_menu
-    puts "1. Input the students"
-    puts "2. Show the students"
-    puts "3. Save the list ot students.csv"
-    puts "4. Load the list from students.csv"
-    puts "9. Exit"
-  end
-
-  def show_students
-    print_header
-    print_students_list(@students)
-    print_footer(@students)
-  end
-
-  def process(selection)
-    case selection
-    when "1"
-        students = input_students
-    when "2"
-        show_students
-    when "3"
-        save_students
-    when "4"
-        load_students
-    when "9"
-        exit
-    else
-        puts "I don't know what you meant, try again"
-    end
-end
-
-def save_students
-    file = File.open("students.csv", "w")
-    @students.each do |student|
-        student_data = [student[:name], student [:cohort]]
-        csv_line = student_data.join(",")
-        file.puts csv_line
-    end
-    file.close
-end
-
-def load_students
-    file = File.open("students.csv", "r")
+def load_students(filename = "students.csv")
+    file = File.open(filename, "r")
     file.readlines.each do |line|
-        name, cohort = line.chomp.split(",")
-        @students << {name: name, cohort: cohort.to_sym}
+    name, cohort = line.chomp.split(',')
+    create_students(name, cohort)
     end
     file.close
 end
+
+def try_load_students
+    $filename = ARGV.first# first argument from the command line
+    if $filename.nil? # get out of the method if it isn't given
+        $filename = "students.csv"
+    end
+    if File.exists?($filename) # if it exists
+      load_students($filename)
+       puts "Loaded #{@students.count} from #{$filename}"
+    else # if it doesn't exist
+      puts "Sorry, #{$filename} doesn't exist."
+      exit # quit the program
+    end
+end
+
+try_load_students
+interactive_menu
