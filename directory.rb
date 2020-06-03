@@ -1,7 +1,6 @@
+@students = []
+
 def input_students
-    
-    students = []
-    
     name = "hold"
     while name != "" do
         x = 0
@@ -21,11 +20,9 @@ def input_students
         
             hash = Hash.new ("default")
             hash = {name: name, cohort: cohort, dob: dob}   
-            students << hash 
-        puts "Now we have #{students.count} student" + (students.count == 1 ? "" : "s")
+            @students << hash 
+        puts "Now we have #{@students.count} student" + (@students.count == 1 ? "" : "s")
     end
-
-    students
 end
 
 
@@ -34,7 +31,7 @@ def print_header
     puts "--------"
 end
 
-def print(names)
+def print_students_list(names)
     names.sort_by! {|student| student[:cohort]}
     names.each do |student|
         puts "#{student[:name]}, #{student[:dob]} (cohort #{student[:cohort]})".center(100)
@@ -47,24 +44,33 @@ end
 
 #nothing will happen until we call the method
 def interactive_menu
-    students = []
     loop do
-        puts "1. Input the students"
+        print_menu
+        process(gets.chomp)
+    end
+  end
+
+  def print_menu
+    puts "1. Input the students"
         puts "2. Show the students"
         puts "9. Exit"
-        selection = gets.chomp
+  end
 
-        case selection
-        when "1"
-            students = input_students
-        when "2"
-            print_header
-            print(students)
-            print_footer(students)
-        when "9"
-            exit
-        else
-            puts "I don't know what you meant, try again"
-        end
+  def show_students
+    print_header
+    print_students_list(@students)
+    print_footer(@students)
+  end
+
+  def process(selection)
+    case selection
+    when "1"
+        students = input_students
+    when "2"
+        show_students
+    when "9"
+        exit
+    else
+        puts "I don't know what you meant, try again"
     end
   end
