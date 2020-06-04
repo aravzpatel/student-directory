@@ -67,11 +67,16 @@ def show_students
 end
 
 def save_students
-    file = File.open($filename, "w") do |a| 
+    CSV.open($filename, "w") do |csv|
         @students.each do |student|
-            a.puts  "#{[student[:name], student[:cohort]].join(",")}"
+            csv << [student[:name], student[:cohort]]
         end
     end
+    # file = File.open($filename, "w") do |a| 
+    #     @students.each do |student|
+    #         a.puts  "#{[student[:name], student[:cohort]].join(",")}"
+    #     end
+    # end
 
     
     # file = File.open($filename, "w") do |a| 
@@ -111,17 +116,20 @@ def print_student_count(names)
 end
 
 def load_students_after_startup(filename = "students.csv")
-    # CSV.foreach($filename) do |row|
-    #     puts row
-    #     # name, cohort = row.chomp.split(",")
-    #     # create_students(name, cohort)
-    # end
-    file = File.open($filename, "r")
-    file.readlines.each do |line|
-    name, cohort = line.chomp.split(',')
-    create_students(name, cohort)
+    CSV.foreach($filename) do |row|
+        name, cohort = row[0], row[1]
+        create_students(name, cohort)
+        # row.each do |student|
+        #     name, cohort = student[0], student[1]
+        #     create_students(name, cohort)
+        # end
     end
-    file.close
+    # file = File.open($filename, "r")
+    # file.readlines.each do |line|
+    # name, cohort = line.chomp.split(',')
+    # create_students(name, cohort)
+    # end
+    # file.close
 end
 
 def load_students_at_startup
