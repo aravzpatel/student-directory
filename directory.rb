@@ -1,3 +1,4 @@
+require 'csv'
 @students = []
 @options_hash = {
     "1" => [:input_students, "1. Input the students", "You are inputting students"],
@@ -67,11 +68,24 @@ end
 
 def save_students
     file = File.open($filename, "w") do |a| 
-        a.puts 
-            @students.each { 
-            |student| [student[:name], student[:cohort]].join(",") 
-        } 
+        @students.each do |student|
+            a.puts  "#{[student[:name], student[:cohort]].join(",")}"
+        end
     end
+
+    
+    # file = File.open($filename, "w") do |a| 
+    #     a.puts "#{[@students[0][:name], @students[0][:cohort]].join(",")}"
+    # end
+    
+    # file = File.open($filename, "w") do |a| a.puts 
+    #     "#{@students.each do |student| student[:name] end}"
+    # end
+    
+    
+    #     @students.each { 
+    #     |student| [student[:name], student[:cohort]].join(",") 
+    # } 
     # @students.each do |student|
     #     file.puts [student[:name], student[:cohort]].join(",")
     # end
@@ -97,7 +111,12 @@ def print_student_count(names)
 end
 
 def load_students_after_startup(filename = "students.csv")
-    file = File.open(filename, "r")
+    # CSV.foreach($filename) do |row|
+    #     puts row
+    #     # name, cohort = row.chomp.split(",")
+    #     # create_students(name, cohort)
+    # end
+    file = File.open($filename, "r")
     file.readlines.each do |line|
     name, cohort = line.chomp.split(',')
     create_students(name, cohort)
