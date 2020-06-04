@@ -66,13 +66,16 @@ def show_students
 end
 
 def save_students
-    file = File.open($filename, "w")
-    @students.each do |student|
-        student_data = [student[:name], student[:cohort]]
-        csv_line = student_data.join(",")
-        file.puts csv_line
+    file = File.open($filename, "w") do |a| 
+        a.puts 
+            @students.each { 
+            |student| [student[:name], student[:cohort]].join(",") 
+        } 
     end
-    file.close
+    # @students.each do |student|
+    #     file.puts [student[:name], student[:cohort]].join(",")
+    # end
+    # file.close
 end
 
 def print_header
@@ -86,7 +89,7 @@ def print_students_list(names)
     # names.sort_by! {|student| student[:cohort]}
     names.map do |student|
         puts "#{student[:name]}, #{student[:dob]} (cohort #{student[:cohort]})".center(75) #if student[:cohort] == choice
-    ends
+    end
 end
 
 def print_student_count(names)
