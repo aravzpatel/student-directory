@@ -3,7 +3,7 @@
     "1" => [:input_students, "1. Input the students", "You are inputting students"],
     "2" => [:show_students, "2. Show the students", "Here are the students:"],
     "3" => [:save_students, "3. Save the list of #{$filename}", "Your list has been saved"],
-    "4" => [:load_students, "4. Load the list from #{$filename}", "The list has been loaded"],
+    "4" => [:load_students_after_startup, "4. Load the list from #{$filename}", "The list has been loaded"],
     "9" => [:exit, "9. exit", "Good bye"]
 }
 
@@ -66,7 +66,7 @@ def show_students
 end
 
 def save_students
-    file = File.open("students.csv", "w")
+    file = File.open($filename, "w")
     @students.each do |student|
         student_data = [student[:name], student[:cohort]]
         csv_line = student_data.join(",")
@@ -86,14 +86,14 @@ def print_students_list(names)
     # names.sort_by! {|student| student[:cohort]}
     names.map do |student|
         puts "#{student[:name]}, #{student[:dob]} (cohort #{student[:cohort]})".center(75) #if student[:cohort] == choice
-    end
+    ends
 end
 
 def print_student_count(names)
     puts "Overall, we have #{names.length} student" + (names.count == 1 ? "" : "s")
 end
 
-def load_students(filename = "students.csv")
+def load_students_after_startup(filename = "students.csv")
     file = File.open(filename, "r")
     file.readlines.each do |line|
     name, cohort = line.chomp.split(',')
@@ -102,19 +102,22 @@ def load_students(filename = "students.csv")
     file.close
 end
 
-def try_load_students
+def load_students_at_startup
     $filename = ARGV.first# first argument from the command line
     if $filename.nil? # get out of the method if it isn't given
         $filename = "students.csv"
     end
     if File.exists?($filename) # if it exists
-      load_students($filename)
+        load_students_after_startup($filename)
        puts "Loaded #{@students.count} from #{$filename}"
     else # if it doesn't exist
-      puts "Sorry, #{$filename} doesn't exist."
-      exit # quit the program
+      puts "#{$filename} doesn't exist."
+      file = File.open("#{$filename}", "w+")
+      file.close
+      puts "#{$filename} has been created."
+    #   exit # quit the program
     end
 end
 
-try_load_students
+load_students_at_startup
 interactive_menu
